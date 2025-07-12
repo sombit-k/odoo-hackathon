@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { 
   User, 
@@ -27,6 +28,7 @@ import {
 } from 'lucide-react';
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   
   // Mock user data
@@ -251,12 +253,16 @@ const UserDashboard = () => {
     </div>
   );
 
+  const handleAddNewListing = () => {
+    navigate('/item');
+  };
+
   const renderMyListings = () => (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">My Listings</h2>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddNewListing}>
           <Plus className="w-4 h-4 mr-2" />
           Add New Listing
         </Button>

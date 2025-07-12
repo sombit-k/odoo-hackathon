@@ -12,7 +12,7 @@ import {
   Camera,
   Plus
 } from 'lucide-react';
-import { useItemStore } from '../stores/itemStore';
+import { useItemStore } from '@/store';
 
 const ItemListingPage = () => {
   const { addItem, items } = useItemStore();
