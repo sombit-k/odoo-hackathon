@@ -6,11 +6,10 @@ const categorySchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            trim: true,
         },
         description: {
             type: String,
-            default: "",
+            required: true,
         },
         icon: {
             type: String,
@@ -32,7 +31,7 @@ const categorySchema = new mongoose.Schema(
         itemCount: {
             type: Number,
             default: 0,
-        }
+        },
     },
     { timestamps: true }
 );

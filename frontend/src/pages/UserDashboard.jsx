@@ -35,8 +35,8 @@ const UserDashboard = () => {
   
   // Zustand stores
   const { user, isAuthenticated, loading: authLoading } = useAuthStore();
-  const { items, loading: itemsLoading, fetchItems, deleteItem } = useItemStore();
-  
+  const { items, loading: itemsLoading, fetchUserItems, deleteItem } = useItemStore();
+
   // Get user's listings - add safety check
   const myListings = user && items ? items.filter(item => item.owner === user._id) : [];
   
@@ -106,18 +106,29 @@ const UserDashboard = () => {
     return icons[status] || Clock;
   };
 
+  // Helper function to get image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop';
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith('http')) return imagePath;
+    
+    // If it's a relative path, prepend the backend URL
+    return `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/${imagePath}`;
+  };
+
   // Fetch items on component mount
   useEffect(() => {
     if (isAuthenticated && user) {
-      fetchItems();
+      fetchUserItems();
     }
-  }, [isAuthenticated, user, fetchItems]);
+  }, [isAuthenticated, user, fetchUserItems]);
 
   // Handle authentication redirect
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate('/login');
-    }
+    } 
   }, [isAuthenticated, authLoading, navigate]);
 
   // Show loading state while checking authentication
@@ -130,8 +141,7 @@ const UserDashboard = () => {
         </div>
       </div>
     );
-  }
-
+  } 
   // Don't render if not authenticated
   if (!isAuthenticated || !user) {
     return null;
@@ -315,9 +325,12 @@ const UserDashboard = () => {
               <div key={listing._id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                 <div className="relative">
                   <img
-                    src={listing.images?.[0] || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop'}
+                    src={getImageUrl(listing.images?.[0])}
                     alt={listing.title}
                     className="w-full h-48 object-cover rounded-t-lg"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop';
+                    }}
                   />
                   <div className="absolute top-2 right-2 flex space-x-1">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(listing.status || 'active')}`}>
@@ -392,7 +405,6 @@ const UserDashboard = () => {
                   alt={purchase.title}
                   className="w-16 h-16 object-cover rounded-lg"
                 />
-                
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">{purchase.title}</h3>
                   <p className="text-sm text-gray-600 mb-2">
@@ -405,7 +417,6 @@ const UserDashboard = () => {
                     </span>
                   </div>
                 </div>
-                
                 <div className="flex space-x-2">
                   <Button size="sm" variant="outline">
                     <MessageCircle className="w-4 h-4 mr-2" />

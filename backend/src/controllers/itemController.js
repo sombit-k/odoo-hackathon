@@ -36,7 +36,7 @@ export const getUserItems = async (req, res) => {
 // POST /api/items
 export const createItem = async (req, res) => {
     try {
-        console.log("req",req.user);
+        console.log("req.user:", req.user);
         // Store local file paths for images
         const images = req.files ? req.files.map(file => path.join("uploads/items", file.filename)) : [];
         const item = new Item({
@@ -57,7 +57,7 @@ export const updateItem = async (req, res) => {
         const item = await Item.findById(req.params.id);
         if (!item) return res.status(404).json({ message: "Item not found" });
 
-        if (item.owner.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+        if (item.owner.toString() !== req.user.userId.toString() && req.user.role !== "admin") {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
@@ -75,7 +75,7 @@ export const deleteItem = async (req, res) => {
         const item = await Item.findById(req.params.id);
         if (!item) return res.status(404).json({ message: "Item not found" });
 
-        if (item.owner.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+        if (item.owner.toString() !== req.user.userId.toString() && req.user.role !== "admin") {
             return res.status(403).json({ message: "Unauthorized" });
         }
 

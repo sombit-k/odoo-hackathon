@@ -10,7 +10,7 @@ import {
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import {userMiddleware} from "../middlewares/userMiddleware.js";
+import {userMiddleware} from "../middleware/userMiddleware.js";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve("uploads/items");

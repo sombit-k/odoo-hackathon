@@ -2,12 +2,11 @@ import { create } from 'zustand';
 import { axiosInstance } from '@/lib/axios';
 import toast from 'react-hot-toast';
 
-
-
 // Retrieve token from localStorage
 function getToken() {
   return localStorage.getItem('token');
 }
+
 const useItemStore = create((set, get) => ({
   // State
   items: [],
@@ -17,22 +16,42 @@ const useItemStore = create((set, get) => ({
   
   // Actions
   
-  // Get all items
+  // Get all items (public endpoint)
   fetchItems: async () => {
     set({ loading: true, error: null });
     try {
-      const token = getToken();
-      const response = await axiosInstance.get('/items', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axiosInstance.get('/items/all');
       set({ items: response.data, loading: false });
       console.log('Fetched items:', response.data);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch items';
+      set({ error: errorMessage, loading: false });
+      toast.error(errorMessage);
+      throw error;
+    }
+  },
+
+  // Get user's own items (authenticated endpoint)
+  fetchUserItems: async () => {
+    set({ loading: true, error: null });
+    try {
+      const token = getToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login.');
+      }
+
+      const response = await axiosInstance.get('/items', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      set({ items: response.data, loading: false });
+      console.log('Fetched user items:', response.data);
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch user items';
       set({ error: errorMessage, loading: false });
       toast.error(errorMessage);
       throw error;
