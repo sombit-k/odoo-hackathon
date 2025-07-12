@@ -30,7 +30,7 @@ export const createItem = async (req, res) => {
             owner: req.userId,
         });
         const savedItem = await item.save();
-        const user = await User.findById(userId);
+        const user = await User.findById(req.user.userId);
         if (user) {
             user.points += 10; // You can set this value as needed
             await user.save();
