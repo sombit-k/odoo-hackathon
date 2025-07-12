@@ -229,15 +229,15 @@ const AdminLayout = () => {
 
         {/* Main Content */}
         <div
-          className={`flex flex-col min-h-[calc(100vh-5rem)]`}
+          className={`flex flex-col min-h-[calc(100vh-5rem)] w-full min-w-0`}
           style={{
             marginLeft: sidebarOpen ? '16rem' : '4rem',
             transition: 'margin-left 0.3s'
           }}
         >
-          <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0 w-full">
             {/* Admin Header (below navbar) */}
-            <header className="bg-white border-b border-gray-200 px-6 py-4">
+            <header className="bg-white border-b border-gray-200 px-6 py-4 min-w-0">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
@@ -263,7 +263,7 @@ const AdminLayout = () => {
             </header>
 
             {/* Content */}
-            <main className="flex-1 overflow-auto p-6">
+            <main className="flex-1 overflow-auto p-6 min-w-0 w-full">
               {renderContent()}
             </main>
           </div>
