@@ -1,47 +1,9 @@
-// backend/src/Routes/userRoutes.js
+import express from "express";
+import { signup, login } from "../controllers/userController.js";
 
-import { Router } from "express";
-const router = Router();
-import User from "../models/user.model.js";
-import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+const router = express.Router();
 
-router.post("/save-user", ClerkExpressWithAuth(), async (req, res) => {
-  try {
-    const userId = req.auth.userId;
+router.post("/signup", signup);
+router.post("/login", login);
 
-    const clerkUser = await clerkClient.users.getUser(userId);
-
-    const email = clerkUser.emailAddresses[0]?.emailAddress || "";
-    const firstName = clerkUser.firstName || "";
-    const lastName = clerkUser.lastName || "";
-
-    let user = await User.findOne({ clerkId: userId });
-
-    if (!user) {
-      user = new User({
-        clerkId: userId,
-        email,
-        firstName,
-        lastName,
-      });
-    } else {
-      user.email = email;
-      user.firstName = firstName;
-      user.lastName = lastName;
-    }
-
-    await user.save();
-
-    res.json({
-      success: true,
-      message: "User saved to MongoDB",
-      user,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to save user" });
-  }
-});
-
-export default router;
+export default router;

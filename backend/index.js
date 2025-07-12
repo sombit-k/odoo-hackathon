@@ -18,13 +18,15 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
     credentials: true,
   })
 );
 app.use(json());
-
-connectDb();
 
 const PORT = process.env.PORT || 3000;
 
@@ -39,7 +41,16 @@ app.use('/api/categories', categoryRoutes);
 
 app.use("/api", userRoutes);
 app.use("/api/items", itemRoutes);
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  connectDb();
-});
+app.use("/api/categories", categoryRoutes);
+
+// Connect to database and start server
+connectDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch(error => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
+  });

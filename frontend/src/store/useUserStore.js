@@ -10,61 +10,25 @@ const useUserStore = create((set, get) => ({
   
   // Actions
   
-  // Save user to backend (called when user signs in)
-  saveUser: async (token) => {
+  // Get current user (using auth/me endpoint)
+  getCurrentUser: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.post(
-        '/save-user',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      set({ user: response.data.user, loading: false });
-      toast.success('User saved successfully!');
-      return response.data.user;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to save user';
-      set({ error: errorMessage, loading: false });
-      toast.error(errorMessage);
-      throw error;
-    }
-  },
-
-  // Get current user
-  getCurrentUser: async (token) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await axiosInstance.get('/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
+      const response = await axiosInstance.get('/auth/me');
       set({ user: response.data, loading: false });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to get user';
       set({ error: errorMessage, loading: false });
-      // Don't show toast for this error as it might be called frequently
       throw error;
     }
   },
 
   // Update user profile
-  updateUser: async (userData, token) => {
+  updateUser: async (userData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.put('/user', userData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
+      const response = await axiosInstance.put('/user', userData);
       set({ user: response.data, loading: false });
       toast.success('Profile updated successfully!');
       return response.data;

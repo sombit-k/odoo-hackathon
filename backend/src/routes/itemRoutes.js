@@ -3,8 +3,6 @@ import {
     getAllItems,
     getItemById,
     createItem,
-    updateItem,
-    deleteItem,
 } from "../controllers/itemController.js";
 import multer from "multer";
 import path from "path";

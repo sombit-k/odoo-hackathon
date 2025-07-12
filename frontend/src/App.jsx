@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
@@ -7,41 +8,46 @@ import ItemListingPage from "./pages/ItemListingPage";
 import UserDashboard from "./pages/UserDashboard";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import StoreTest from "./components/StoreTest";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import useAuthStore from "./store/useAuthStore";
 
 function App() {
+  const { checkAuth, isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <div className="min-h-screen">
       <Navbar />
       <Routes>
         <Route path="/" element={<Navigate to="/landingpage" />} />
+        <Route path="/landingpage" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route
           path="/admin"
-          element={true ? <AdminPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/landingpage"
-          element={true ? <LandingPage /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <AdminPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/item"
-          element={true ? <ItemListingPage /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <ItemListingPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/dashboard"
-          element={true ? <UserDashboard /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <UserDashboard /> : <Navigate to="/login" />}
         />
         <Route
           path="/product/"
-          element={true ? <ProductDetailPage /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/product/:id"
-          element={true ? <ProductDetailPage /> : <Navigate to="/login" />}
+          element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/login" />}
         />
-        <Route
-          path="/store-test"
-          element={<StoreTest />}
-        />
+        <Route path="/store-test" element={<StoreTest />} />
       </Routes>
     </div>
   );
