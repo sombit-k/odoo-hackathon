@@ -112,9 +112,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 w-full min-w-0">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-w-0">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -139,7 +139,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Charts and Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-w-0">
         {/* Recent Activity */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Platform Health */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 min-w-0">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Platform Health</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
