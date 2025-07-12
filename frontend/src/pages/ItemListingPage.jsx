@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { 
   Upload, 
@@ -12,26 +13,39 @@ import {
   Camera,
   Plus
 } from 'lucide-react';
-import { useItemStore } from '@/store';
+import useItemStore from '@/store/useItemStore';
+import useCategoryStore from '@/store/useCategoryStore';
+import toast from 'react-hot-toast';
 
 const ItemListingPage = () => {
-  const { addItem, items } = useItemStore();
+  const navigate = useNavigate();
+  const { createItem, loading: itemLoading } = useItemStore();
+  const { categories, fetchCategories, getActiveCategories } = useCategoryStore();
   
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     description: '',
-    price: '',
+    pointsValue: '',
     category: '',
     condition: '',
     location: '',
+    size: 'One Size',
+    type: 'both',
     tags: []
   });
   
   const [images, setImages] = useState([]);
   const [mainImage, setMainImage] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = [
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const activeCategories = getActiveCategories();
+
+  const categories_fallback = [
     'Electronics',
     'Fashion',
     'Home & Garden',
@@ -48,6 +62,24 @@ const ItemListingPage = () => {
     'Good',
     'Fair',
     'Poor'
+  ];
+
+  const sizes = [
+    'XS',
+    'S',
+    'M',
+    'L',
+    'XL',
+    'XXL',
+    'XXXL',
+    'One Size',
+    'Custom'
+  ];
+
+  const types = [
+    { value: 'swap', label: 'Swap Only' },
+    { value: 'points', label: 'Points Only' },
+    { value: 'both', label: 'Both Swap & Points' }
   ];
 
   const handleInputChange = (e) => {
@@ -104,19 +136,50 @@ const ItemListingPage = () => {
     setMainImage(image);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    const newItem = {
-      id: Date.now(),
-      ...formData,
-      images: images.map(img => img.url),
-      mainImage: mainImage?.url,
-      createdAt: new Date().toISOString()
-    };
+    setIsSubmitting(true);
     
-    addItem(newItem);
-    console.log('Form submitted:', newItem);
+    try {
+      // Validate required fields
+      if (!formData.title || !formData.description || !formData.category || !formData.condition) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      // Prepare item data for backend
+      const itemData = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        type: formData.type,
+        size: formData.size,
+        condition: formData.condition,
+        images: images.map(img => img.url),
+        tags: formData.tags.filter(tag => tag.trim() !== ''),
+        pointsValue: formData.pointsValue ? Number(formData.pointsValue) : 0,
+        location: formData.location
+      };
+
+      // Create item using Zustand store
+      await createItem(itemData);
+      
+      // Success feedback
+      toast.success('Item created successfully!');
+      
+      // Navigate back to dashboard
+      navigate('/dashboard');
+      
+    } catch (error) {
+      console.error('Error creating item:', error);
+      toast.error('Failed to create item. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -126,17 +189,17 @@ const ItemListingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Button variant="ghost" size="sm" className="mr-4">
+              <Button variant="ghost" size="sm" className="mr-4" onClick={handleBack}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
               <h1 className="text-xl font-semibold text-gray-900">Create New Listing</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" disabled={isSubmitting}>
                 Save Draft
               </Button>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
                 Preview
               </Button>
             </div>
@@ -251,14 +314,14 @@ const ItemListingPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Product Name */}
               <div className="md:col-span-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                   Product Name *
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="title"
+                  name="title"
+                  value={formData.title}
                   onChange={handleInputChange}
                   placeholder="Enter product name"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -280,11 +343,19 @@ const ItemListingPage = () => {
                   required
                 >
                   <option value="">Select category</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
+                  {activeCategories.length > 0 ? (
+                    activeCategories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))
+                  ) : (
+                    categories_fallback.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -310,23 +381,63 @@ const ItemListingPage = () => {
                 </select>
               </div>
 
-              {/* Price */}
+              {/* Type */}
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                  Price ($)
+                <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                  Transaction Type
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {types.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Size */}
+              <div>
+                <label htmlFor="size" className="block text-sm font-medium text-gray-700 mb-2">
+                  Size
+                </label>
+                <select
+                  id="size"
+                  name="size"
+                  value={formData.size}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {sizes.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Points Value */}
+              <div>
+                <label htmlFor="pointsValue" className="block text-sm font-medium text-gray-700 mb-2">
+                  Points Value
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="number"
-                    id="price"
-                    name="price"
-                    value={formData.price}
+                    id="pointsValue"
+                    name="pointsValue"
+                    value={formData.pointsValue}
                     onChange={handleInputChange}
-                    placeholder="0.00"
+                    placeholder="0"
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     min="0"
-                    step="0.01"
+                    step="1"
                   />
                 </div>
               </div>
@@ -374,11 +485,22 @@ const ItemListingPage = () => {
 
           {/* Submit Buttons */}
           <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" size="lg">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="lg" 
+              onClick={handleBack}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button type="submit" size="lg" className="bg-blue-600 hover:bg-blue-700">
-              Create Listing
+            <Button 
+              type="submit" 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={isSubmitting || itemLoading}
+            >
+              {isSubmitting || itemLoading ? 'Creating...' : 'Create Listing'}
             </Button>
           </div>
         </form>
