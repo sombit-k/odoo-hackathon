@@ -1,11 +1,11 @@
 // Test component to demonstrate all store functionality
 import React, { useEffect, useState } from 'react';
 import { useItemStore, useUserStore, useCategoryStore } from '@/store';
-import { useAuth } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
+import useAuthStore from '@/store/useAuthStore';
 
 const StoreTest = () => {
-  const { getToken, isSignedIn } = useAuth();
+  const { getToken, isSignedIn } = useAuthStore();
   const [testResults, setTestResults] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
 

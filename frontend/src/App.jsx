@@ -40,7 +40,7 @@ function App() {
           element={isAuthenticated ? <UserDashboard /> : <Navigate to="/login" />}
         />
         <Route
-          path="/product/"
+          path="/product"
           element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/login" />}
         />
         <Route
