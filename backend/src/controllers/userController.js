@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const signup = async (req, res) => {
-    const { name, email, phoneNumber, password } = req.body;
+    const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -17,7 +17,6 @@ export const signup = async (req, res) => {
     const user = await User.create({
         name,
         email,
-        phoneNumber,
         password: hashedPassword
     });
 
@@ -28,7 +27,8 @@ export const signup = async (req, res) => {
         user: {
             id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            isAdmin: user.isAdmin,
         },
         token
     });

@@ -1,5 +1,5 @@
 import Item from "../models/item.model.js";
-
+import User from "../models/user.model.js";
 // GET /api/items
 export const getAllItems = async (req, res) => {
     try {
@@ -30,6 +30,11 @@ export const createItem = async (req, res) => {
             owner: req.user.userId,
         });
         const savedItem = await item.save();
+        const user = await User.findById(userId);
+        if (user) {
+            user.points += 10; // You can set this value as needed
+            await user.save();
+        }
         res.status(201).json(savedItem);
     } catch (err) {
         res.status(400).json({ message: err.message });
