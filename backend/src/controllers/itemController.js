@@ -1,5 +1,6 @@
 import Item from "../models/item.model.js";
-import User from "../models/user.model.js";
+import path from "path";
+
 // GET /api/items
 export const getAllItems = async (req, res) => {
     try {
@@ -24,14 +25,29 @@ export const getItemById = async (req, res) => {
 // POST /api/items
 export const createItem = async (req, res) => {
     try {
+        // Store local file paths for images
+        const images = req.files ? req.files.map(file => path.join("uploads/items", file.filename)) : [];
         const item = new Item({
             ...req.body,
-            owner: req.user.userId,
+            images,
+            owner: "60d0fe4f5311236168a109ca", // Placeholder for owner ID
         });
         const savedItem = await item.save();
         res.status(201).json(savedItem);
     } catch (err) {
         res.status(400).json({ message: err.message });
+    }
+};
+
+export const getUserItems = async (req, res) => {
+    try {
+        const userId = req.user.userId; // coming from your JWT middleware
+
+        const items = await Item.find({ owner: userId }).sort({ createdAt: -1 });
+
+        res.status(200).json(items);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 };
 

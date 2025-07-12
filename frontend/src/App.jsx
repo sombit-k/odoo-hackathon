@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -40,7 +39,7 @@ function App() {
           element={isAuthenticated ? <UserDashboard /> : <Navigate to="/login" />}
         />
         <Route
-          path="/product/"
+          path="/product"
           element={isAuthenticated ? <ProductDetailPage /> : <Navigate to="/login" />}
         />
         <Route
