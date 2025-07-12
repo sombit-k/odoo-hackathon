@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
-// import Header from './Header'; // Remove unused import
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Home, LayoutDashboard, Search, LogIn } from 'lucide-react';
-import SaveUserButton from '@/components/SaveUserButton'; // Ensure this component is correctly imported
+import { Home, LayoutDashboard, Search, LogIn, LogOut, User } from 'lucide-react';
+import useAuthStore from '@/store/useAuthStore';
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   const handleSearch = (e) => {
     e.preventDefault();
     // Handle search logic here
     console.log('Searching for:', searchTerm);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/landingpage');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -32,37 +42,32 @@ const Navbar = () => {
               <Home className="w-4 h-4" />
               <span>Home</span>
             </Link>
-            <Link 
-              to="/dashboard" 
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Dashboard</span>
-            </Link>
-            <Link //delete this later
-              to="/admin" 
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>(delete later) Admin</span>
-            </Link>
-            <Link //delete this later
-              to="/product" 
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>(delete later) Product</span>
-            </Link>
-            <Link //Test link
-              to="/store-test" 
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>🧪 Store Test</span>
-            </Link>
-
-
-            <SaveUserButton />
+            
+            {isAuthenticated && (
+              <>
+                <Link 
+                  to="/dashboard" 
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </Link>
+                <Link 
+                  to="/admin" 
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Admin</span>
+                </Link>
+                <Link 
+                  to="/store-test" 
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>🧪 Store Test</span>
+                </Link>
+              </>
+            )}
             
             {/* Search Form */}
             <form onSubmit={handleSearch} className="flex items-center">
@@ -79,19 +84,46 @@ const Navbar = () => {
             </form>
           </nav>
 
-          {/* Auth Button */}
+          {/* Auth Section */}
           <div className="flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                <LogIn className="w-4 h-4" />
-                <span>Login</span>
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center space-x-2 text-gray-700">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">{user?.name || 'User'}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center space-x-2"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </Button>
+              </>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="flex items-center space-x-2">
+                    <LogIn className="w-4 h-4" />
+                    <span>Login</span>
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm" className="flex items-center space-x-2">
+                    <User className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 export default Navbar;

@@ -47,3 +47,43 @@ export const login = async (req, res) => {
 
     res.status(200).json({ user, token });
 };
+
+export const getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export const updateUser = async (req, res) => {
+    try {
+        const { name, email, phoneNumber } = req.body;
+        
+        // Check if email is being changed and if it's already taken
+        if (email) {
+            const existingUser = await User.findOne({ email, _id: { $ne: req.userId } });
+            if (existingUser) {
+                return res.status(400).json({ message: "Email already in use" });
+            }
+        }
+        
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            { name, email, phoneNumber },
+            { new: true }
+        ).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
