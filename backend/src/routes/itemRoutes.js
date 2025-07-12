@@ -1,13 +1,16 @@
 import express from "express";
 import {
+    getUserItems,
     getAllItems,
     getItemById,
     createItem,
-    getUserItems
+    updateItem,      // <-- add this
+    deleteItem       // <-- add this
 } from "../controllers/itemController.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import {userMiddleware} from "../middlewares/userMiddleware.js";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve("uploads/items");
@@ -33,14 +36,14 @@ const router = express.Router();
 router.get("/all", getAllItems);
 
 
-// List items for the logged-in user
 router.get("/", userMiddleware, getUserItems);
+
 
 // Get single item details
 router.get("/:id", getItemById);
 
 // Create new item with local image upload
-router.post("/", upload.array("images", 5), createItem);
+router.post("/", userMiddleware, upload.array("images", 5), createItem);
 
 // Edit item (by owner or admin)
 router.put("/:id", updateItem);
@@ -48,4 +51,4 @@ router.put("/:id", updateItem);
 // Delete item (by owner or admin)
 router.delete("/:id", deleteItem);
 
-export default router;
+export default router;

@@ -21,8 +21,15 @@ const useItemStore = create((set, get) => ({
   fetchItems: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.get('/items');
+      const token = getToken();
+      const response = await axiosInstance.get('/items', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       set({ items: response.data, loading: false });
+      console.log('Fetched items:', response.data);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch items';
@@ -49,16 +56,44 @@ const useItemStore = create((set, get) => ({
 
   // Create new item
   createItem: async (itemData) => {
-    console.log(getToken());
     set({ loading: true, error: null });
     try {
-      const token = getToken(); // Ensure token is retrieved here
+      const token = getToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login.');
+      }
 
-      const response = await axiosInstance.post('/items', itemData, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Add text fields
+      Object.keys(itemData).forEach(key => {
+        if (key !== 'images' && itemData[key] !== null && itemData[key] !== undefined) {
+          if (Array.isArray(itemData[key])) {
+            itemData[key].forEach(item => formData.append(key, item));
+          } else {
+            formData.append(key, itemData[key]);
+          }
         }
       });
+
+      // Add image files if they exist
+      if (itemData.images && itemData.images.length > 0) {
+        itemData.images.forEach(image => {
+          if (image instanceof File) {
+            formData.append('images', image);
+          }
+        });
+      }
+
+      const response = await axiosInstance.post('/items', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
       const newItem = response.data;
       
       // Add the new item to the items array
@@ -70,7 +105,8 @@ const useItemStore = create((set, get) => ({
       toast.success('Item created successfully!');
       return newItem;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to create item';
+      console.error('Create item error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create item';
       set({ error: errorMessage, loading: false });
       toast.error(errorMessage);
       throw error;
@@ -81,7 +117,17 @@ const useItemStore = create((set, get) => ({
   updateItem: async (id, itemData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.put(`/items/${id}`, itemData);
+      const token = getToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login.');
+      }
+
+      const response = await axiosInstance.put(`/items/${id}`, itemData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const updatedItem = response.data;
       
       // Update the item in the items array
@@ -107,7 +153,17 @@ const useItemStore = create((set, get) => ({
   deleteItem: async (id) => {
     set({ loading: true, error: null });
     try {
-      await axiosInstance.delete(`/items/${id}`);
+      const token = getToken();
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login.');
+      }
+
+      await axiosInstance.delete(`/items/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       // Remove the item from the items array
       set(state => ({
