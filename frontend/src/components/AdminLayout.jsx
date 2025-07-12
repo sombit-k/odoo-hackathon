@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import AdminDashboard from '@/components/AdminDashboard';
-import Header from './Header';
 import { 
   Search, 
   Users, 
@@ -168,10 +167,7 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      
-      
-      {/* Content under header */}
+      {/* Content under navbar */}
       <div className="pt-20 flex h-[calc(100vh-5rem)]">
         {/* Sidebar */}
         <div
@@ -233,14 +229,14 @@ const AdminLayout = () => {
 
         {/* Main Content */}
         <div
-          className={`flex flex-col min-h-[calc(100vh-5rem)] pt-20`}
+          className={`flex flex-col min-h-[calc(100vh-5rem)]`}
           style={{
-            marginLeft: sidebarOpen ? '16rem' : '4rem', // 64px or 256px
+            marginLeft: sidebarOpen ? '16rem' : '4rem',
             transition: 'margin-left 0.3s'
           }}
         >
           <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-            {/* Admin Header (below main header) */}
+            {/* Admin Header (below navbar) */}
             <header className="bg-white border-b border-gray-200 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -276,5 +272,7 @@ const AdminLayout = () => {
     </div>
   );
 };
+
+
 
 export default AdminLayout;
