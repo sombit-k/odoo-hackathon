@@ -4,8 +4,7 @@ import {
     getItemById,
     createItem,
 } from "../controllers/itemController.js";
-import { userMiddleware } from "../middlewares/userMiddleware.js";
-// import { verifyToken } from "../middleware/auth.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -16,8 +15,7 @@ router.get("/", getAllItems);
 router.get("/:id", getItemById);
 
 // Create new item (logged-in users only)
-router.post("/", userMiddleware, createItem);
-// router.post("/", createItem);
+router.post("/", authMiddleware, createItem);
 
 
 export default router;

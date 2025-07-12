@@ -24,10 +24,10 @@ export const getItemById = async (req, res) => {
 // POST /api/items
 export const createItem = async (req, res) => {
     try {
-        console.log(req.user.userId);
+        console.log(req.userId);
         const item = new Item({
             ...req.body,
-            owner: req.user.userId,
+            owner: req.userId,
         });
         const savedItem = await item.save();
         const user = await User.findById(userId);

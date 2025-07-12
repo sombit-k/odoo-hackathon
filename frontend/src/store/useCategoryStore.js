@@ -21,7 +21,8 @@ const useCategoryStore = create((set, get) => ({
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch categories';
       set({ error: errorMessage, loading: false });
-      toast.error(errorMessage);
+      // Don't show error toast for categories as it might not be implemented yet
+      console.warn('Categories endpoint not available:', errorMessage);
       throw error;
     }
   },
@@ -42,14 +43,10 @@ const useCategoryStore = create((set, get) => ({
   },
 
   // Create new category (admin only)
-  createCategory: async (categoryData, token) => {
+  createCategory: async (categoryData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.post('/categories', categoryData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.post('/categories', categoryData);
       const newCategory = response.data;
       
       // Add the new category to the categories array
@@ -69,14 +66,10 @@ const useCategoryStore = create((set, get) => ({
   },
 
   // Update category (admin only)
-  updateCategory: async (id, categoryData, token) => {
+  updateCategory: async (id, categoryData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.put(`/categories/${id}`, categoryData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.put(`/categories/${id}`, categoryData);
       const updatedCategory = response.data;
       
       // Update the category in the categories array
@@ -99,14 +92,10 @@ const useCategoryStore = create((set, get) => ({
   },
 
   // Delete category (admin only)
-  deleteCategory: async (id, token) => {
+  deleteCategory: async (id) => {
     set({ loading: true, error: null });
     try {
-      await axiosInstance.delete(`/categories/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axiosInstance.delete(`/categories/${id}`);
       
       // Remove the category from the categories array
       set(state => ({
@@ -158,3 +147,4 @@ const useCategoryStore = create((set, get) => ({
 }));
 
 export default useCategoryStore;
+
