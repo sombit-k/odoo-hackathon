@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import AdminDashboard from '@/components/AdminDashboard';
+import Header from './Header';
 import { 
   Search, 
   Users, 
@@ -67,7 +68,7 @@ const AdminLayout = () => {
   ];
 
   const renderUserManagement = () => (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">User Management</h3>
         
@@ -166,89 +167,111 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
-        {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-700">
-          <div className="flex items-center justify-between">
-            {sidebarOpen && (
-              <h2 className="text-xl font-bold">Admin Panel</h2>
-            )}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      
+      
+      {/* Content under header */}
+      <div className="pt-20 flex h-[calc(100vh-5rem)]">
+        {/* Sidebar */}
+        <div
+          className={`fixed top-20 left-0 h-[calc(100vh-5rem)] bg-gray-900 text-white transition-all duration-300 flex flex-col overflow-hidden flex-shrink-0 z-20 ${
+            sidebarOpen ? 'w-64' : 'w-16'
+          }`}
+        >
+          {/* Sidebar Header */}
+          <div className="p-4 border-b border-gray-700">
+            <div className="flex items-center justify-between">
+              {sidebarOpen && (
+                <h2 className="text-xl font-bold whitespace-nowrap">Admin Panel</h2>
+              )}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 rounded-lg hover:bg-gray-700 transition-colors flex-shrink-0"
+              >
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4">
+            <ul className="space-y-2">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 justify-start' : 'justify-center'} px-3 py-2 rounded-lg transition-colors ${
+                        activeTab === item.id
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      }`}
+                      title={!sidebarOpen ? item.label : ''}
+                    >
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      {sidebarOpen && <span className="whitespace-nowrap">{item.label}</span>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* Sidebar Footer */}
+          <div className="p-4 border-t border-gray-700">
+            <button 
+              className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 justify-start' : 'justify-center'} px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors`}
+              title={!sidebarOpen ? 'Logout' : ''}
             >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span className="whitespace-nowrap">Logout</span>}
             </button>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      activeTab === item.id
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {sidebarOpen && <span>{item.label}</span>}
+        {/* Main Content */}
+        <div
+          className={`flex flex-col min-h-[calc(100vh-5rem)] pt-20`}
+          style={{
+            marginLeft: sidebarOpen ? '16rem' : '4rem', // 64px or 256px
+            transition: 'margin-left 0.3s'
+          }}
+        >
+          <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+            {/* Admin Header (below main header) */}
+            <header className="bg-white border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {navigationItems.find(item => item.id === activeTab)?.label}
+                  </h1>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                   </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-gray-700">
-          <button className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
-            <LogOut className="w-5 h-5" />
-            {sidebarOpen && <span>Logout</span>}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {navigationItems.find(item => item.id === activeTab)?.label}
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                  <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                </div>
               </div>
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            </div>
-          </div>
-        </header>
+            </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-auto p-6">
-          {renderContent()}
-        </main>
+            {/* Content */}
+            <main className="flex-1 overflow-auto p-6">
+              {renderContent()}
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );
