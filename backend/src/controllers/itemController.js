@@ -35,3 +35,15 @@ export const createItem = async (req, res) => {
     }
 };
 
+export const getUserItems = async (req, res) => {
+    try {
+        const userId = req.user.userId; // coming from your JWT middleware
+
+        const items = await Item.find({ owner: userId }).sort({ createdAt: -1 });
+
+        res.status(200).json(items);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+

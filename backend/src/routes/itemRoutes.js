@@ -3,12 +3,17 @@ import {
     getAllItems,
     getItemById,
     createItem,
+    getUserItems
 } from "../controllers/itemController.js";
-import {userMiddleware} from "../middlewares/userMiddleware.js";
+import { userMiddleware } from "../middlewares/userMiddleware.js";
 const router = express.Router();
 
 // List all approved items
-router.get("/", getAllItems);
+router.get("/all", getAllItems);
+
+
+// List items for the logged-in user
+router.get("/", userMiddleware, getUserItems);
 
 // Get single item details
 router.get("/:id", getItemById);
