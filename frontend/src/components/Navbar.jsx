@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Home, LayoutDashboard, Search, LogIn } from 'lucide-react';
+import SaveUserButton from '@/components/SaveUserButton'; // Ensure this component is correctly imported
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,6 +52,13 @@ const Navbar = () => {
             >
               <LayoutDashboard className="w-4 h-4" />
               <span>(delete later) Product</span>
+            </Link>
+            <Link //delete this later
+              to="/product" 
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              <span>(delete later) save-user  <SaveUserButton /></span>
             </Link>
             
             {/* Search Form */}
