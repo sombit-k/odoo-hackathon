@@ -12,8 +12,11 @@ import {
   Camera,
   Plus
 } from 'lucide-react';
+import { useItemStore } from '../stores/itemStore';
 
 const ItemListingPage = () => {
+  const { addItem, items } = useItemStore();
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -104,7 +107,16 @@ const ItemListingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission logic here
-    console.log('Form submitted:', { ...formData, images });
+    const newItem = {
+      id: Date.now(),
+      ...formData,
+      images: images.map(img => img.url),
+      mainImage: mainImage?.url,
+      createdAt: new Date().toISOString()
+    };
+    
+    addItem(newItem);
+    console.log('Form submitted:', newItem);
   };
 
   return (
