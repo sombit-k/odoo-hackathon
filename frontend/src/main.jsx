@@ -17,10 +17,10 @@ if (!rootElement) {
 }
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <BrowserRouter>
         <App />
-      </ClerkProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ClerkProvider>
   </React.StrictMode>
 );
