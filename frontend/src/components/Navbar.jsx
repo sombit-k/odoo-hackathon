@@ -53,13 +53,9 @@ const Navbar = () => {
               <LayoutDashboard className="w-4 h-4" />
               <span>(delete later) Product</span>
             </Link>
-            <Link //delete this later
-              to="/product" 
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>(delete later) save-user  <SaveUserButton /></span>
-            </Link>
+
+
+            <SaveUserButton />
             
             {/* Search Form */}
             <form onSubmit={handleSearch} className="flex items-center">

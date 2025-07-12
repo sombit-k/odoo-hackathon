@@ -7,6 +7,7 @@ function SaveUserButton() {
   const { getToken } = useAuth();
 
   const handleSaveUser = async () => {
+    console.log("user being saved")
     const token = await getToken();
 
     const res = await axios.post(
