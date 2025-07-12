@@ -22,8 +22,11 @@ router.post("/", createItem);
 
 // Edit item (by owner or admin)
 // router.put("/:id", verifyToken, updateItem);
+router.put("/:id", updateItem);
+
 
 // Delete item (by owner or admin)
 // router.delete("/:id", verifyToken, deleteItem);
+router.delete("/:id", deleteItem);
 
 export default router;
