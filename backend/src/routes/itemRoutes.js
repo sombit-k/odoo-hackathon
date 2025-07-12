@@ -9,6 +9,7 @@ import {
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import {userMiddleware} from "../middlewares/userMiddleware.js";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve("uploads/items");
@@ -37,7 +38,7 @@ router.get("/", getAllItems);
 router.get("/:id", getItemById);
 
 // Create new item with local image upload
-router.post("/", upload.array("images", 5), createItem);
+router.post("/", userMiddleware, upload.array("images", 5), createItem);
 
 // Edit item (by owner or admin)
 router.put("/:id", updateItem);

@@ -14,7 +14,7 @@ const itemSchema = new mongoose.Schema(
             maxlength: 1000,
         },
         category: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             ref: "Category",
             required: true,
         },
