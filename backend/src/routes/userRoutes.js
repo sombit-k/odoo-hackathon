@@ -2,20 +2,21 @@
 
 import { Router } from "express";
 const router = Router();
-import User, { findOne } from "../models/User";
-import { ClerkExpressWithAuth, users } from "@clerk/clerk-sdk-node";
+import User from "../models/user.model.js";
+import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 router.post("/save-user", ClerkExpressWithAuth(), async (req, res) => {
   try {
     const userId = req.auth.userId;
 
-    const clerkUser = await users.getUser(userId);
+    const clerkUser = await clerkClient.users.getUser(userId);
 
     const email = clerkUser.emailAddresses[0]?.emailAddress || "";
     const firstName = clerkUser.firstName || "";
     const lastName = clerkUser.lastName || "";
 
-    let user = await findOne({ clerkId: userId });
+    let user = await User.findOne({ clerkId: userId });
 
     if (!user) {
       user = new User({
