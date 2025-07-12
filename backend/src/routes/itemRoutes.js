@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    getUserItems,
     getAllItems,
     getItemById,
     createItem,

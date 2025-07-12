@@ -25,7 +25,8 @@ export const getItemById = async (req, res) => {
 // GET /api/items (for authenticated user)
 export const getUserItems = async (req, res) => {
     try {
-        const items = await Item.find({ owner: req.user._id });
+        const items = await Item.find({ owner: req.user.userId });
+        console.log("User items:", items);
         res.status(200).json(items);
     } catch (err) {
         res.status(500).json({ message: err.message });

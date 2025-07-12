@@ -21,8 +21,15 @@ const useItemStore = create((set, get) => ({
   fetchItems: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.get('/items');
+      const token = getToken();
+      const response = await axiosInstance.get('/items', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       set({ items: response.data, loading: false });
+      console.log('Fetched items:', response.data);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch items';
