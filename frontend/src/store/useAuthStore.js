@@ -31,6 +31,7 @@ const useAuthStore = create(
             error: null 
           });
           
+          toast.success('Login successful!');
           return response.data;
         } catch (error) {
           const errorMessage = error.response?.data?.message || 'Login failed';
@@ -40,6 +41,7 @@ const useAuthStore = create(
             isAuthenticated: false,
             user: null 
           });
+          toast.error(errorMessage);
           throw error;
         }
       },
@@ -64,6 +66,7 @@ const useAuthStore = create(
             error: null 
           });
           
+          toast.success('Account created successfully!');
           return response.data;
         } catch (error) {
           const errorMessage = error.response?.data?.message || 'Signup failed';
@@ -73,6 +76,7 @@ const useAuthStore = create(
             isAuthenticated: false,
             user: null 
           });
+          toast.error(errorMessage);
           throw error;
         }
       },
@@ -95,6 +99,8 @@ const useAuthStore = create(
             loading: false,
             error: null 
           });
+          
+          toast.success('Logged out successfully!');
         }
       },
 
@@ -102,7 +108,7 @@ const useAuthStore = create(
       checkAuth: async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-          set({ isAuthenticated: false, user: null });
+          set({ isAuthenticated: false, user: null, loading: false });
           return;
         }
 
@@ -115,12 +121,13 @@ const useAuthStore = create(
           const response = await axiosInstance.get("/me");
           
           set({ 
-            user: response.data, 
+            user: response.data.user || response.data, 
             isAuthenticated: true, 
             loading: false,
             error: null 
           });
         } catch (error) {
+          console.error('Auth check failed:', error);
           // Token is invalid, clear everything
           localStorage.removeItem('token');
           delete axiosInstance.defaults.headers.common['Authorization'];

@@ -34,11 +34,11 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   
   // Zustand stores
-  const { user, isAuthenticated } = useAuthStore();
-  const { items, loading, fetchItems, deleteItem } = useItemStore();
+  const { user, isAuthenticated, loading: authLoading } = useAuthStore();
+  const { items, loading: itemsLoading, fetchItems, deleteItem } = useItemStore();
   
-  // Get user's listings
-  const myListings = items.filter(item => item.owner === user?._id);
+  // Get user's listings - add safety check
+  const myListings = user && items ? items.filter(item => item.owner === user._id) : [];
   
   // Mock purchases data (since we don't have a purchase store yet)
   const myPurchases = [
@@ -106,6 +106,37 @@ const UserDashboard = () => {
     return icons[status] || Clock;
   };
 
+  // Fetch items on component mount
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchItems();
+    }
+  }, [isAuthenticated, user, fetchItems]);
+
+  // Handle authentication redirect
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
   const renderProfile = () => (
     <div className="space-y-6">
       {/* Profile Header */}
@@ -124,7 +155,7 @@ const UserDashboard = () => {
           
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{user?.name || 'User'}</h1>
-            <div className="flex items-center space-x-4 text-gray-600 mb-4">
+            <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-4">
               <div className="flex items-center">
                 <Mail className="w-4 h-4 mr-1" />
                 {user?.email || 'email@example.com'}
@@ -135,7 +166,7 @@ const UserDashboard = () => {
               </div>
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
-                Joined {user?.joinDate || new Date(user?.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) || 'Recently'}
+                Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}
               </div>
             </div>
             
@@ -178,7 +209,7 @@ const UserDashboard = () => {
             <Package className="w-6 h-6 text-blue-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Active Listings</h3>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{myListings.filter(item => item.status === 'active').length}</p>
+          <p className="text-2xl font-bold text-blue-600 mt-1">{myListings.filter(item => item.status === 'active' || !item.status).length}</p>
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -186,7 +217,7 @@ const UserDashboard = () => {
             <ShoppingBag className="w-6 h-6 text-green-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Total Sales</h3>
-          <p className="text-2xl font-bold text-green-600 mt-1">${myListings.filter(item => item.status === 'sold').reduce((sum, item) => sum + (item.price || 0), 0)}</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">${myListings.filter(item => item.status === 'sold').reduce((sum, item) => sum + (item.pointsValue || 0), 0)}</p>
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -255,7 +286,7 @@ const UserDashboard = () => {
       </div>
 
       {/* Loading State */}
-      {loading && (
+      {itemsLoading && (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading your listings...</p>
@@ -263,7 +294,7 @@ const UserDashboard = () => {
       )}
 
       {/* Empty State */}
-      {!loading && myListings.length === 0 && (
+      {!itemsLoading && myListings.length === 0 && (
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No listings yet</h3>
@@ -276,10 +307,10 @@ const UserDashboard = () => {
       )}
 
       {/* Listings Grid */}
-      {!loading && myListings.length > 0 && (
+      {!itemsLoading && myListings.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {myListings.map((listing) => {
-            const StatusIcon = getStatusIcon(listing.status);
+            const StatusIcon = getStatusIcon(listing.status || 'active');
             return (
               <div key={listing._id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                 <div className="relative">
@@ -300,7 +331,7 @@ const UserDashboard = () => {
                 
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-1">{listing.title}</h3>
-                  <p className="text-lg font-bold text-blue-600 mb-2">${listing.price || 0}</p>
+                  <p className="text-lg font-bold text-blue-600 mb-2">{listing.pointsValue || 0} pts</p>
                   
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
                     <div className="flex items-center">
@@ -315,7 +346,7 @@ const UserDashboard = () => {
                   
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">
-                      {new Date(listing.createdAt).toLocaleDateString()}
+                      {listing.createdAt ? new Date(listing.createdAt).toLocaleDateString() : 'Recently'}
                     </span>
                     <div className="flex space-x-1">
                       <Button size="sm" variant="outline">
@@ -405,18 +436,6 @@ const UserDashboard = () => {
         return renderProfile();
     }
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchItems();
-    }
-  }, [isAuthenticated, fetchItems]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">

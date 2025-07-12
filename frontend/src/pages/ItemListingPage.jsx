@@ -15,12 +15,14 @@ import {
 } from 'lucide-react';
 import useItemStore from '@/store/useItemStore';
 import useCategoryStore from '@/store/useCategoryStore';
+import useAuthStore from '@/store/useAuthStore';
 import toast from 'react-hot-toast';
 
 const ItemListingPage = () => {
   const navigate = useNavigate();
   const { createItem, loading: itemLoading } = useItemStore();
   const { categories, fetchCategories, getActiveCategories } = useCategoryStore();
+  const { user, isAuthenticated, loading: authLoading } = useAuthStore();
   
   const [formData, setFormData] = useState({
     title: '',
@@ -42,6 +44,31 @@ const ItemListingPage = () => {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  // Check authentication without redirecting immediately
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast.error('Please login to create a listing');
+      navigate('/login');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the form if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const activeCategories = getActiveCategories();
 
@@ -155,7 +182,7 @@ const ItemListingPage = () => {
         type: formData.type,
         size: formData.size,
         condition: formData.condition,
-        images: images.map(img => img.url),
+        images: images.map(img => img.file), // Send actual File objects
         tags: formData.tags.filter(tag => tag.trim() !== ''),
         pointsValue: formData.pointsValue ? Number(formData.pointsValue) : 0,
         location: formData.location
@@ -164,15 +191,12 @@ const ItemListingPage = () => {
       // Create item using Zustand store
       await createItem(itemData);
       
-      // Success feedback
-      toast.success('Item created successfully!');
-      
       // Navigate back to dashboard
       navigate('/dashboard');
       
     } catch (error) {
       console.error('Error creating item:', error);
-      toast.error('Failed to create item. Please try again.');
+      // Error is already handled in the store
     } finally {
       setIsSubmitting(false);
     }
