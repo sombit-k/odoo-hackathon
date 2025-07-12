@@ -1,20 +1,28 @@
-import express from "express";
-import dotenv from "dotenv";
+import express, { json } from "express";
+import { config } from "dotenv";
+import cors from "cors";
 import { connectDb } from "./src/lib/db.js";
-import itemRoutes from "./src/routes/itemRoutes.js";
-// Load environment variables first
-dotenv.config();
+import userRoutes from "./src/routes/userRoutes.js";
+
+config();
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(json());
+
+connectDb();
+
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the backend server!");
-});
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/api/items", itemRoutes);
+app.use("/api", userRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDb();
-})
+});
