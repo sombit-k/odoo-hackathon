@@ -24,17 +24,11 @@ export const getItemById = async (req, res) => {
 // POST /api/items
 export const createItem = async (req, res) => {
     try {
-        console.log(req.userId);
         const item = new Item({
             ...req.body,
-            owner: req.userId,
+            owner: req.user.userId,
         });
         const savedItem = await item.save();
-        const user = await User.findById(req.user.userId);
-        if (user) {
-            user.points += 10; // You can set this value as needed
-            await user.save();
-        }
         res.status(201).json(savedItem);
     } catch (err) {
         res.status(400).json({ message: err.message });

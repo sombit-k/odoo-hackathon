@@ -58,11 +58,7 @@ const SignupPage = () => {
       newErrors.email = 'Please enter a valid email';
     }
     
-    if (!formData.phoneNumber) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\+?[\d\s-()]{10,}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
-    }
+  
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -91,7 +87,6 @@ const SignupPage = () => {
       const signupData = {
         name: formData.name,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
         password: formData.password
       };
       
@@ -173,7 +168,7 @@ const SignupPage = () => {
             </div>
 
             {/* Phone Number Field */}
-            <div>
+            {/* <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
               </label>
@@ -195,7 +190,7 @@ const SignupPage = () => {
               {errors.phoneNumber && (
                 <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
               )}
-            </div>
+            </div> */}
 
             {/* Password Field */}
             <div>

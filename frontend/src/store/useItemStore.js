@@ -2,6 +2,12 @@ import { create } from 'zustand';
 import { axiosInstance } from '@/lib/axios';
 import toast from 'react-hot-toast';
 
+
+
+// Retrieve token from localStorage
+function getToken() {
+  return localStorage.getItem('token');
+}
 const useItemStore = create((set, get) => ({
   // State
   items: [],
@@ -43,9 +49,16 @@ const useItemStore = create((set, get) => ({
 
   // Create new item
   createItem: async (itemData) => {
+    console.log(getToken());
     set({ loading: true, error: null });
     try {
-      const response = await axiosInstance.post('/items', itemData);
+      const token = getToken(); // Ensure token is retrieved here
+
+      const response = await axiosInstance.post('/items', itemData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       const newItem = response.data;
       
       // Add the new item to the items array

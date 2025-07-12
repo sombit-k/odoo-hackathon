@@ -4,8 +4,7 @@ import {
     getItemById,
     createItem,
 } from "../controllers/itemController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
-
+import {userMiddleware} from "../middlewares/userMiddleware.js";
 const router = express.Router();
 
 // List all approved items
@@ -15,7 +14,6 @@ router.get("/", getAllItems);
 router.get("/:id", getItemById);
 
 // Create new item (logged-in users only)
-router.post("/", authMiddleware, createItem);
-
+router.post("/", userMiddleware, createItem);
 
 export default router;

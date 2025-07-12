@@ -15,7 +15,7 @@ const useAuthStore = create(
       login: async (credentials) => {
         set({ loading: true, error: null });
         try {
-          const response = await axiosInstance.post("/auth/login", credentials);
+          const response = await axiosInstance.post("/login", credentials);
           const { user, token } = response.data;
           
           // Store token in localStorage
@@ -48,7 +48,7 @@ const useAuthStore = create(
       signup: async (userData) => {
         set({ loading: true, error: null });
         try {
-          const response = await axiosInstance.post("/auth/signup", userData);
+          const response = await axiosInstance.post("/signup", userData);
           const { user, token } = response.data;
           
           // Store token in localStorage
@@ -81,7 +81,7 @@ const useAuthStore = create(
       logout: async () => {
         set({ loading: true });
         try {
-          await axiosInstance.post("/auth/logout");
+          await axiosInstance.post("/logout");
         } catch (error) {
           console.error("Logout failed:", error);
         } finally {
@@ -112,7 +112,7 @@ const useAuthStore = create(
           axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Verify token with backend
-          const response = await axiosInstance.get("/auth/me");
+          const response = await axiosInstance.get("/me");
           
           set({ 
             user: response.data, 
