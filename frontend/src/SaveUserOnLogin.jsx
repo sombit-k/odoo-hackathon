@@ -1,6 +1,6 @@
 // frontend/src/SaveUserOnLogin.jsx
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { axiosInstance } from "@/lib/axiosInstance";
+import { axiosInstance } from "@/lib/axios";
 import { useEffect } from "react";
 
 function SaveUserOnLogin() {
