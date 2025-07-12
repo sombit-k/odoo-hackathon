@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
 import { Routes, Route, Navigate } from "react-router-dom";
