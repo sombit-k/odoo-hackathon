@@ -35,6 +35,7 @@ export const getUserItems = async (req, res) => {
 // POST /api/items
 export const createItem = async (req, res) => {
     try {
+        console.log("req",req.user);
         // Store local file paths for images
         const images = req.files ? req.files.map(file => path.join("uploads/items", file.filename)) : [];
         const item = new Item({
