@@ -32,7 +32,11 @@ const upload = multer({ storage });
 const router = express.Router();
 
 // List all approved items
-router.get("/", getAllItems);
+router.get("/all", getAllItems);
+
+
+router.get("/", userMiddleware, getUserItems);
+
 
 // Get single item details
 router.get("/:id", getItemById);
