@@ -155,7 +155,7 @@ const LandingPage = () => {
                   Start Swapping
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+                <Button size="lg" variant="outline" className="border-white text-black hover:text-blue bg-white">
                   Browse Items
                 </Button>
               </div>
