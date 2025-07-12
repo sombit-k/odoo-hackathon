@@ -13,7 +13,7 @@ The objective is to promote **sustainable fashion** and help reduce textile wast
 
 | Name                  | Email                                                                 |
 | --------------------- | --------------------------------------------------------------------- |
-| **Sombit Karmakar**   | [sombit.karmakar@gmail.com](mailto:sombitkarmakar@gmail.com)         |
+| **Sombit Karmakar**   | [sombit.karmakar@gmail.com](mailto:sombitkarmakar018@gmail.com)         |
 | **Kartikeya Kaushal** | [kaushalkartikeya733@gmail.com](mailto:kaushalkartikeya733@gmail.com) |
 | **Sumit Thakur**      | [tsumit0505@gmail.com](mailto:tsumit0505@gmail.com)                   |
 | **Somu Chaulya**      | [somuchaulya8@gmail.com](mailto:somuchaulya8@gmail.com)               |
