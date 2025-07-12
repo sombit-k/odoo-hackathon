@@ -6,9 +6,11 @@ import LandingPage from "./pages/LandingPage";
 import ItemListingPage from "./pages/ItemListingPage";
 import UserDashboard from "./pages/UserDashboard";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import StoreTest from "./components/StoreTest";
 
 function App() {
-  return (    <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       <Navbar />
       <Routes>
         <Route path="/" element={<Navigate to="/landingpage" />} />
@@ -35,6 +37,10 @@ function App() {
         <Route
           path="/product/:id"
           element={true ? <ProductDetailPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/store-test"
+          element={<StoreTest />}
         />
       </Routes>
     </div>
