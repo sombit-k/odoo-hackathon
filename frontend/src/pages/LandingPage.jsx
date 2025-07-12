@@ -131,47 +131,7 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-blue-600">SwapHub</h1>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
-                Home
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
-                Browse
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
-                How It Works
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium">
-                Community
-              </a>
-            </nav>
-
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                Login
-              </Button>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                Sign Up
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gray-50 pt-16">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-20"></div>
