@@ -20,6 +20,51 @@ const userSchema=new mongoose.Schema(
             type:String,
             default:"",
         },
+        points:{
+            type:Number,
+            default:100, // Starting points for new users
+        },
+        bio:{
+            type:String,
+            default:"",
+            maxlength:500,
+        },
+        location:{
+            city:{
+                type:String,
+                default:"",
+            },
+            state:{
+                type:String,
+                default:"",
+            },
+            country:{
+                type:String,
+                default:"",
+            }
+        },
+        phone:{
+            type:String,
+            default:"",
+        },
+        isActive:{
+            type:Boolean,
+            default:true,
+        },
+        swapsCompleted:{
+            type:Number,
+            default:0,
+        },
+        rating:{
+            type:Number,
+            default:5.0,
+            min:1,
+            max:5,
+        },
+        totalRatings:{
+            type:Number,
+            default:0,
+        }
     },
     {timestamps: true}
 );
