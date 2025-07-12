@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import useAuthStore from '@/store/useAuthStore';
+import useItemStore from '@/store/useItemStore';
 import { 
   User, 
   MapPin, 
@@ -31,69 +33,14 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   
-  // Mock user data
-  const userProfile = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    location: 'New York, NY',
-    joinDate: 'January 2024',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    rating: 4.8,
-    totalSwaps: 24,
-    totalListings: 12,
-    bio: 'Passionate about sustainable living and finding new homes for pre-loved items. Always looking for vintage electronics and books!'
-  };
-
-  // Mock listings data
-  const myListings = [
-    {
-      id: 1,
-      title: 'Vintage Leather Jacket',
-      image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=200&h=200&fit=crop',
-      price: '$85',
-      status: 'active',
-      views: 156,
-      likes: 23,
-      datePosted: '2 days ago',
-      category: 'Fashion'
-    },
-    {
-      id: 2,
-      title: 'Canon EOS Camera',
-      image: 'https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=200&h=200&fit=crop',
-      price: '$320',
-      status: 'sold',
-      views: 89,
-      likes: 12,
-      datePosted: '1 week ago',
-      category: 'Electronics'
-    },
-    {
-      id: 3,
-      title: 'Design Books Set',
-      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=200&fit=crop',
-      price: '$45',
-      status: 'pending',
-      views: 34,
-      likes: 8,
-      datePosted: '3 days ago',
-      category: 'Books'
-    },
-    {
-      id: 4,
-      title: 'Bluetooth Headphones',
-      image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=200&h=200&fit=crop',
-      price: '$95',
-      status: 'active',
-      views: 78,
-      likes: 15,
-      datePosted: '5 days ago',
-      category: 'Electronics'
-    }
-  ];
-
-  // Mock purchases data
+  // Zustand stores
+  const { user, isAuthenticated } = useAuthStore();
+  const { items, loading, fetchItems, deleteItem } = useItemStore();
+  
+  // Get user's listings
+  const myListings = items.filter(item => item.owner === user?._id);
+  
+  // Mock purchases data (since we don't have a purchase store yet)
   const myPurchases = [
     {
       id: 1,
@@ -166,8 +113,8 @@ const UserDashboard = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6">
           <div className="relative">
             <img
-              src={userProfile.avatar}
-              alt={userProfile.name}
+              src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={user?.name || 'User'}
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
             <button className="absolute bottom-2 right-2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-lg">
@@ -176,39 +123,39 @@ const UserDashboard = () => {
           </div>
           
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{userProfile.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{user?.name || 'User'}</h1>
             <div className="flex items-center space-x-4 text-gray-600 mb-4">
               <div className="flex items-center">
                 <Mail className="w-4 h-4 mr-1" />
-                {userProfile.email}
+                {user?.email || 'email@example.com'}
               </div>
               <div className="flex items-center">
                 <MapPin className="w-4 h-4 mr-1" />
-                {userProfile.location}
+                {user?.location || 'Location not set'}
               </div>
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
-                Joined {userProfile.joinDate}
+                Joined {user?.joinDate || new Date(user?.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) || 'Recently'}
               </div>
             </div>
             
             <div className="flex items-center space-x-6 mb-4">
               <div className="flex items-center">
                 <Star className="w-5 h-5 text-yellow-400 fill-current mr-1" />
-                <span className="font-semibold">{userProfile.rating}</span>
+                <span className="font-semibold">{user?.rating || 0}</span>
                 <span className="text-gray-500 ml-1">rating</span>
               </div>
               <div>
-                <span className="font-semibold">{userProfile.totalSwaps}</span>
+                <span className="font-semibold">{user?.totalSwaps || 0}</span>
                 <span className="text-gray-500 ml-1">swaps</span>
               </div>
               <div>
-                <span className="font-semibold">{userProfile.totalListings}</span>
+                <span className="font-semibold">{myListings.length}</span>
                 <span className="text-gray-500 ml-1">listings</span>
               </div>
             </div>
             
-            <p className="text-gray-700 mb-4">{userProfile.bio}</p>
+            <p className="text-gray-700 mb-4">{user?.bio || 'No bio available'}</p>
             
             <div className="flex space-x-3">
               <Button className="bg-blue-600 hover:bg-blue-700">
@@ -231,7 +178,7 @@ const UserDashboard = () => {
             <Package className="w-6 h-6 text-blue-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Active Listings</h3>
-          <p className="text-2xl font-bold text-blue-600 mt-1">8</p>
+          <p className="text-2xl font-bold text-blue-600 mt-1">{myListings.filter(item => item.status === 'active').length}</p>
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -239,7 +186,7 @@ const UserDashboard = () => {
             <ShoppingBag className="w-6 h-6 text-green-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Total Sales</h3>
-          <p className="text-2xl font-bold text-green-600 mt-1">$2,450</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">${myListings.filter(item => item.status === 'sold').reduce((sum, item) => sum + (item.price || 0), 0)}</p>
         </div>
         
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -247,7 +194,7 @@ const UserDashboard = () => {
             <Heart className="w-6 h-6 text-purple-600" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900">Wishlist Items</h3>
-          <p className="text-2xl font-bold text-purple-600 mt-1">15</p>
+          <p className="text-2xl font-bold text-purple-600 mt-1">{user?.wishlist?.length || 0}</p>
         </div>
       </div>
     </div>
@@ -255,6 +202,16 @@ const UserDashboard = () => {
 
   const handleAddNewListing = () => {
     navigate('/item');
+  };
+
+  const handleDeleteListing = async (id) => {
+    if (window.confirm('Are you sure you want to delete this listing?')) {
+      try {
+        await deleteItem(id);
+      } catch (error) {
+        console.error('Failed to delete listing:', error);
+      }
+    }
   };
 
   const renderMyListings = () => (
@@ -297,59 +254,87 @@ const UserDashboard = () => {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading your listings...</p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && myListings.length === 0 && (
+        <div className="text-center py-12">
+          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No listings yet</h3>
+          <p className="text-gray-600 mb-4">Create your first listing to start swapping!</p>
+          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddNewListing}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add New Listing
+          </Button>
+        </div>
+      )}
+
       {/* Listings Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {myListings.map((listing) => {
-          const StatusIcon = getStatusIcon(listing.status);
-          return (
-            <div key={listing.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="relative">
-                <img
-                  src={listing.image}
-                  alt={listing.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="absolute top-2 right-2 flex space-x-1">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(listing.status)}`}>
-                    {listing.status}
-                  </span>
-                </div>
-                <button className="absolute top-2 left-2 p-1 bg-white rounded-full hover:bg-gray-100">
-                  <MoreVertical className="w-4 h-4 text-gray-600" />
-                </button>
-              </div>
-              
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1">{listing.title}</h3>
-                <p className="text-lg font-bold text-blue-600 mb-2">{listing.price}</p>
-                
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                  <div className="flex items-center">
-                    <Eye className="w-4 h-4 mr-1" />
-                    {listing.views} views
+      {!loading && myListings.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {myListings.map((listing) => {
+            const StatusIcon = getStatusIcon(listing.status);
+            return (
+              <div key={listing._id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="relative">
+                  <img
+                    src={listing.images?.[0] || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop'}
+                    alt={listing.title}
+                    className="w-full h-48 object-cover rounded-t-lg"
+                  />
+                  <div className="absolute top-2 right-2 flex space-x-1">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(listing.status || 'active')}`}>
+                      {listing.status || 'active'}
+                    </span>
                   </div>
-                  <div className="flex items-center">
-                    <Heart className="w-4 h-4 mr-1" />
-                    {listing.likes} likes
-                  </div>
+                  <button className="absolute top-2 left-2 p-1 bg-white rounded-full hover:bg-gray-100">
+                    <MoreVertical className="w-4 h-4 text-gray-600" />
+                  </button>
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{listing.datePosted}</span>
-                  <div className="flex space-x-1">
-                    <Button size="sm" variant="outline">
-                      <Edit className="w-3 h-3" />
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <Share className="w-3 h-3" />
-                    </Button>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">{listing.title}</h3>
+                  <p className="text-lg font-bold text-blue-600 mb-2">${listing.price || 0}</p>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                    <div className="flex items-center">
+                      <Eye className="w-4 h-4 mr-1" />
+                      {listing.views || 0} views
+                    </div>
+                    <div className="flex items-center">
+                      <Heart className="w-4 h-4 mr-1" />
+                      {listing.likes || 0} likes
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      {new Date(listing.createdAt).toLocaleDateString()}
+                    </span>
+                    <div className="flex space-x-1">
+                      <Button size="sm" variant="outline">
+                        <Edit className="w-3 h-3" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleDeleteListing(listing._id)}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Share className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 
@@ -421,13 +406,25 @@ const UserDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchItems();
+    }
+  }, [isAuthenticated, fetchItems]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Header */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {userProfile.name}! Manage your listings and track your swaps.</p>
+          <p className="text-gray-600">Welcome back, {user?.name || 'User'}! Manage your listings and track your swaps.</p>
         </div>
 
         {/* Navigation Tabs */}
@@ -450,7 +447,7 @@ const UserDashboard = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
-            My Listings
+            My Listings ({myListings.length})
           </button>
           <button
             onClick={() => setActiveTab('purchases')}

@@ -3,7 +3,8 @@ import {
     getAllItems,
     getItemById,
     createItem,
-    getUserItems
+    updateItem,      // <-- add this
+    deleteItem       // <-- add this
 } from "../controllers/itemController.js";
 import multer from "multer";
 import path from "path";
@@ -30,11 +31,7 @@ const upload = multer({ storage });
 const router = express.Router();
 
 // List all approved items
-router.get("/all", getAllItems);
-
-
-// List items for the logged-in user
-router.get("/", userMiddleware, getUserItems);
+router.get("/", getAllItems);
 
 // Get single item details
 router.get("/:id", getItemById);
@@ -48,4 +45,4 @@ router.put("/:id", updateItem);
 // Delete item (by owner or admin)
 router.delete("/:id", deleteItem);
 
-export default router;
+export default router;
